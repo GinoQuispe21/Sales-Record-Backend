@@ -29,6 +29,7 @@ public class AdminServiceImpl implements AdminService{
         admin.setName(adminRequest.getName());
         admin.setPhoneNumber(adminRequest.getPhoneNumber());
         admin.setEmail(adminRequest.getEmail());
+        admin.setPassword(adminRequest.getPassword());
         return adminRepository.save(admin);
     }
 

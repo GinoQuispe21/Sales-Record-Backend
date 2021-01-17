@@ -32,4 +32,9 @@ public class Admin {
     @Column(unique = true)
     @Size(max = 30)
     private String email;
+
+    @NotBlank
+    @NotNull
+    @Size(max = 15)
+    private String password;
 }
