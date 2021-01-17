@@ -51,4 +51,6 @@ public class SaveCustomerResource {
     @Column(unique = true)
     @Size(max = 20)
     private String phoneNumber;
+
+    private int state;
 }

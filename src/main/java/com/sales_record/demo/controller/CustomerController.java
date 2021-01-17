@@ -27,34 +27,31 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("/customers")
-    public Page<CustomerResource> getAllCustomers(Pageable pageable) {
-        Page<Customer> customerPage = customerService.getAllCustomers(pageable);
+    @GetMapping("/admins/{adminId}/customers")
+    public Page<CustomerResource> getAllCustomersByAdminId(@PathVariable(name = "adminId") Long adminId, Pageable pageable) {
+        Page<Customer> customerPage = customerService.getAllCustomersByUserId(adminId, pageable);
         List<CustomerResource> resources = customerPage.getContent().stream().map(this::convertToResource).collect(Collectors.toList());
-
         return new PageImpl<>(resources, pageable, resources.size());
     }
 
-    @GetMapping("/customers/{id}")
-    public CustomerResource getCustomerById(@PathVariable(name = "id") Long customerId) {
-        return convertToResource(customerService.getCustomerById(customerId));
+    @GetMapping("/admins/{adminId}/customers/{customerId}")
+    public CustomerResource getCustomerByIdAndAdminId(@PathVariable(name = "adminId") Long adminId, @PathVariable(name = "customerId") Long customerId) {
+        return convertToResource(customerService.getCustomerByIdAndAdminId(adminId, customerId));
     }
 
-    @PostMapping("/customers")
-    public CustomerResource createCustomer(@Valid @RequestBody SaveCustomerResource resource)  {
-        Customer customer = convertToEntity(resource);
-        return convertToResource(customerService.createCustomer(customer));
+    @PostMapping("/admins/{adminId}/customers")
+    public CustomerResource createCustomer(@PathVariable(name = "adminId") Long adminId, @Valid @RequestBody SaveCustomerResource resource) {
+        return convertToResource(customerService.createCustomer(adminId, convertToEntity(resource)));
     }
 
-    @PutMapping("/customers/{id}")
-    public CustomerResource updateCustomer(@PathVariable(name = "id") Long customerId, @Valid @RequestBody SaveCustomerResource resource) {
-        Customer customer = convertToEntity(resource);
-        return convertToResource(customerService.updateCustomer(customerId, customer));
+    @PutMapping("/admins/{adminId}/customers/{customerId}")
+    public CustomerResource updateCustomer(@PathVariable(name = "adminId") Long adminId, @PathVariable(name = "customerId") Long customerId, @Valid @RequestBody SaveCustomerResource resource) {
+        return convertToResource(customerService.updateCustomer(adminId, customerId, convertToEntity(resource)));
     }
 
-    @DeleteMapping("/customers/{id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable(name = "id") Long customerId) {
-        return customerService.deleteCustomer(customerId);
+    @DeleteMapping("/admins/{adminId}/customers/{customerId}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable(name = "adminId") Long adminId, @PathVariable(name = "customerId") Long customerId) {
+        return customerService.deleteCustomer(adminId, customerId);
     }
 
     private Customer convertToEntity(SaveCustomerResource resource) { return mapper.map(resource, Customer.class); }
