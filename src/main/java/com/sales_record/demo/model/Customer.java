@@ -1,5 +1,6 @@
 package com.sales_record.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -57,5 +58,12 @@ public class Customer {
     @Column(unique = true)
     @Size(max = 20)
     private String phoneNumber;
+
+    private int state;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "admin_id", nullable = false)
+    @JsonIgnore
+    private Admin admin;
 
 }

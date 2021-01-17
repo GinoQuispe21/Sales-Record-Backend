@@ -14,5 +14,5 @@ public class CustomerResource {
     private String district;
     private String address;
     private String phoneNumber;
-
+    private int state;
 }
