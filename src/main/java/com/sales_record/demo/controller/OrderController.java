@@ -27,33 +27,33 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/orders")
-    public Page<OrderResource> getAllOrders(Pageable pageable) {
-        Page<Order> orderPage = orderService.getAllOrders(pageable);
-        List<OrderResource> resources = orderPage.getContent().stream().map(this::convertToResource).collect(Collectors.toList());
+    public List<Order> getAllOrders() { return orderService.getAllOrders(); }
 
+    @GetMapping("/customers/{customerId}/orders")
+    public Page<OrderResource> getAllOrdersByCustomerId(@PathVariable(name = "customerId") Long customerId, Pageable pageable) {
+        Page<Order> orderPage = orderService.getAllOrdersByCustomerId(customerId, pageable);
+        List<OrderResource> resources = orderPage.getContent().stream().map(this::convertToResource).collect(Collectors.toList());
         return new PageImpl<>(resources, pageable, resources.size());
     }
 
-    @GetMapping("/orders/{id}")
-    public OrderResource getOrderById(@PathVariable(name = "id") Long orderId) {
-        return convertToResource(orderService.getOrderById(orderId));
+    @GetMapping("/customers/{customerId}/orders/{orderId}")
+    public OrderResource getOrderByIdAndCustomerId(@PathVariable(name = "customerId") Long customerId, @PathVariable(name = "orderId") Long orderId) {
+        return convertToResource(orderService.getOrderByIdAndCustomerId(customerId, orderId));
     }
 
-    @PostMapping("/orders")
-    public OrderResource createOrder(@Valid @RequestBody SaveOrderResource resource)  {
-        Order order = convertToEntity(resource);
-        return convertToResource(orderService.createOrder(order));
+    @PostMapping("/customers/{customerId}/orders")
+    public OrderResource createOrder(@PathVariable(name = "customerId") Long customerId, @Valid @RequestBody SaveOrderResource resource) {
+        return convertToResource(orderService.createOrder(customerId, convertToEntity(resource)));
     }
 
-    @PutMapping("/orders/{id}")
-    public OrderResource updateOrder(@PathVariable(name = "id") Long orderId, @Valid @RequestBody SaveOrderResource resource) {
-        Order order = convertToEntity(resource);
-        return convertToResource(orderService.updateOrder(orderId, order));
+    @PutMapping("/customers/{customerId}/orders/{orderId}")
+    public OrderResource updateOrder(@PathVariable(name = "customerId") Long customerId, @PathVariable(name = "orderId") Long orderId, @Valid @RequestBody SaveOrderResource resource) {
+        return convertToResource(orderService.updateOrder(customerId, orderId, convertToEntity(resource)));
     }
 
-    @DeleteMapping("/orders/{id}")
-    public ResponseEntity<?> deleteOrder(@PathVariable(name = "id") Long orderId) {
-        return orderService.deleteOrder(orderId);
+    @DeleteMapping("/customers/{customerId}/orders/{orderId}")
+    public ResponseEntity<?> deleteOrder(@PathVariable(name = "customerId") Long customerId, @PathVariable(name = "orderId") Long orderId) {
+        return orderService.deleteOrder(customerId, orderId);
     }
 
     private Order convertToEntity(SaveOrderResource resource) { return mapper.map(resource, Order.class); }
