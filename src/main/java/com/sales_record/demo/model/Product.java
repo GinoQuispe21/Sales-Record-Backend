@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -46,4 +47,7 @@ public class Product {
     private double price;
 
     private int available; //0: available , 1: not available
+
+    @OneToMany(mappedBy = "product")
+    List<OrderDetail> orderDetails;
 }
