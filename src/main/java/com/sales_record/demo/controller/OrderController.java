@@ -1,5 +1,6 @@
 package com.sales_record.demo.controller;
 
+import com.sales_record.demo.model.CartLine;
 import com.sales_record.demo.model.Order;
 import com.sales_record.demo.resource.OrderResource;
 import com.sales_record.demo.resource.SaveOrderResource;
@@ -54,6 +55,11 @@ public class OrderController {
     @DeleteMapping("/customers/{customerId}/orders/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable(name = "customerId") Long customerId, @PathVariable(name = "orderId") Long orderId) {
         return orderService.deleteOrder(customerId, orderId);
+    }
+
+    @PostMapping("/orders/{orderId}/products")
+    public OrderResource AssignProductsByOrderId(@PathVariable(name = "orderId") Long orderId, @Valid @RequestBody List<CartLine> cartLines){
+        return convertToResource(orderService.AssignProductsByOrderId(orderId, cartLines));
     }
 
     private Order convertToEntity(SaveOrderResource resource) { return mapper.map(resource, Order.class); }

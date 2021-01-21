@@ -1,5 +1,6 @@
 package com.sales_record.demo.service;
 
+import com.sales_record.demo.model.CartLine;
 import com.sales_record.demo.model.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,5 +15,5 @@ public interface OrderService {
     Order getOrderByIdAndCustomerId(Long customerId, Long orderId);
     Page<Order> getAllOrdersByCustomerId(Long customerId, Pageable pageable);
     List<Order> getAllOrders();
-
+    Order AssignProductsByOrderId(Long orderId, List<CartLine> products);
 }

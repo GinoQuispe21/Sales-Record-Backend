@@ -1,10 +1,11 @@
 package com.sales_record.demo.service;
 
 import com.sales_record.demo.exception.ResourceNotFoundException;
-import com.sales_record.demo.model.Customer;
-import com.sales_record.demo.model.Order;
+import com.sales_record.demo.model.*;
 import com.sales_record.demo.repository.CustomerRepository;
+import com.sales_record.demo.repository.OrderDetailRepository;
 import com.sales_record.demo.repository.OrderRepository;
+import com.sales_record.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,12 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     @Override
     public ResponseEntity<?> deleteOrder(Long customerId, Long orderId) {
@@ -71,6 +78,24 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+    @Override
+    public Order AssignProductsByOrderId(Long orderId, List<CartLine> products) {
+        Order order =  orderRepository.findById(orderId).orElseThrow(()-> new ResourceNotFoundException("order", "Id", orderId));
+        for(CartLine product : products){
+            OrderDetail orderDetail = new OrderDetail();
+            Product product1 = productRepository.findById(product.getId()).orElseThrow(() -> new ResourceNotFoundException("Product", "Id",product.getId()));
+            orderDetail.setProduct(product1);
+            orderDetail.setOrder(order);
+            orderDetail.setQuantity(product.getQuantity());
+
+            product1.getOrderDetails().add(orderDetail);
+            order.getOrderDetails().add(orderDetail);
+
+            orderDetailRepository.save(orderDetail);
+        }
+        return order;
     }
 
 }
