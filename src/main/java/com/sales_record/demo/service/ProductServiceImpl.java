@@ -1,7 +1,10 @@
 package com.sales_record.demo.service;
 
 import com.sales_record.demo.exception.ResourceNotFoundException;
+import com.sales_record.demo.model.CartLine;
+import com.sales_record.demo.model.OrderDetail;
 import com.sales_record.demo.model.Product;
+import com.sales_record.demo.repository.OrderDetailRepository;
 import com.sales_record.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,11 +12,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ProductServiceImpl implements ProductService{
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     @Override
     public ResponseEntity<?> deleteProduct(Long productId) {
@@ -50,5 +59,30 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public Page<Product> getAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<CartLine> getAllProductsByOrderId(Long orderId) {
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+        List<CartLine> cartLine = new ArrayList<>();
+
+        for (OrderDetail order: orderDetails) {
+            CartLine info = new CartLine();
+            Product product = order.getProduct();
+            info.setModel(product.getModel());
+            info.setQuality(product.getQuality());
+            info.setGender(product.getGender());
+            info.setColor(product.getColor());
+            info.setSize(product.getSize());
+            long e = order.getId();
+            info.setId(e);
+            double price = product.getPrice();
+            info.setPrice(price);
+            int i = order.getQuantity();
+            info.setQuantity(i);
+            cartLine.add(info);
+        }
+
+        return cartLine;
     }
 }
