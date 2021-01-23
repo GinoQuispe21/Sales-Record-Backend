@@ -82,6 +82,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Order AssignProductsByOrderId(Long orderId, List<CartLine> products) {
+        double amount = 0.00;
         Order order =  orderRepository.findById(orderId).orElseThrow(()-> new ResourceNotFoundException("order", "Id", orderId));
         for(CartLine product : products){
             OrderDetail orderDetail = new OrderDetail();
@@ -89,12 +90,12 @@ public class OrderServiceImpl implements OrderService{
             orderDetail.setProduct(product1);
             orderDetail.setOrder(order);
             orderDetail.setQuantity(product.getQuantity());
-
+            amount = amount + (product1.getPrice() * product.getQuantity());
             product1.getOrderDetails().add(orderDetail);
             order.getOrderDetails().add(orderDetail);
-
             orderDetailRepository.save(orderDetail);
         }
+        order.setAmount(amount);
         return order;
     }
 
